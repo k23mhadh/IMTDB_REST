@@ -8,9 +8,8 @@ app = Flask(__name__)
 PORT = 3200
 HOST = '0.0.0.0'
 
-
-with open('./databases/movies.json', 'r') as jsf:
-   movies = json.load(jsf)  # Just load the list
+with open('{}/databases/movies.json'.format("."), 'r') as jsf:
+   movies = json.load(jsf)["movies"]
 
 # root message
 @app.route("/", methods=['GET'])
@@ -20,7 +19,6 @@ def home():
 @app.route("/template", methods=['GET'])
 def template():
     return make_response(render_template('index.html', body_text='This is my HTML template for Movie service'),200)
-
 
 @app.route("/json", methods=['GET'])
 def get_json():
@@ -34,7 +32,6 @@ def get_movie_byid(movieid):
             res = make_response(jsonify(movie),200)
             return res
     return make_response(jsonify({"error":"Movie ID not found"}),400)
-
 
 @app.route("/moviesbytitle", methods=['GET'])
 def get_movie_bytitle():
@@ -51,6 +48,46 @@ def get_movie_bytitle():
         res = make_response(jsonify(json),200)
     return res
 
+#TP
+@app.route("/moviesbydirector", methods=['GET'])
+def get_movie_bydirector():
+    if request.args:
+        req = request.args
+        director_movies = [movie for movie in movies if movie["director"] == req["director"]]
+        if director_movies:
+            res = make_response(jsonify(director_movies), 200)
+            return res
+    res = make_response(jsonify({"error": "No movies found for this director"}), 404)
+    return res
+
+@app.route("/moviesbyrating/<rating>", methods=['GET'])
+def get_movies_by_rating(rating):
+    filtered_movies = [movie for movie in movies if float(movie["rating"]) == float(rating)]
+    
+    if not filtered_movies:
+        res = make_response(jsonify({"error": "No movies found with rating {}".format(rating)}), 400)
+        return res
+    
+    res = make_response(jsonify(filtered_movies), 200)
+    return res
+
+@app.route("/moviesbyratingrange/<min_rating>/<max_rating>", methods=['GET'])
+def get_movies_by_rating_range(min_rating, max_rating):
+    try:
+        min_rating = float(min_rating)
+        max_rating = float(max_rating)
+    except ValueError:
+        res = make_response(jsonify({"error": "Invalid rating values"}), 400)
+        return res
+
+    filtered_movies = [movie for movie in movies if min_rating <= movie["rating"] <= max_rating]
+
+    if not filtered_movies:
+        res = make_response(jsonify({"error": "Invalid rating values"}), 400)
+        return res
+
+    res = make_response(jsonify(filtered_movies), 200)
+    return res
 
 @app.route("/addmovie/<movieid>", methods=['POST'])
 def add_movie(movieid):
@@ -68,8 +105,7 @@ def add_movie(movieid):
 def write(movies):
     with open('{}/databases/movies.json'.format("."), 'w') as f:
         json.dump(movies, f)
-        
-        
+    
 @app.route("/movies/<movieid>/<rate>", methods=['PUT'])
 def update_movie_rating(movieid, rate):
     for movie in movies:
@@ -81,6 +117,21 @@ def update_movie_rating(movieid, rate):
     res = make_response(jsonify({"error":"movie ID not found"}),201)
     return res
 
+@app.route("/help", methods=['GET'])
+def help():
+    endpoints = {
+        "/": "Root message",
+        "/template": "Displays a simple HTML template",
+        "/json": "Returns the list of movies in JSON format",
+        "/movies/<movieid>": "Get movie details by movie ID",
+        "/moviesbytitle": "Get movie details by movie title",
+        "/moviesbydirector": "Get movies by director name",
+        "/moviesbyrating": "Get movies by rating score",
+        "/moviesbyratingrange/<min_rating>/<max_rating>": "Get movies within rating range [<min_rating>,<max_rating>]",
+        "/addmovie/<movieid>": "Add a new movie to the database",
+        "/movies/<movieid>/<rate>": "Update the rating of a movie"
+    }
+    return make_response(jsonify(endpoints), 200)
 
 if __name__ == "__main__":
     #p = sys.argv[1]
