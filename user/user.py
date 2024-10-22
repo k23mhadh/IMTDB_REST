@@ -31,20 +31,20 @@ def get_user_byid(userid):
 @app.route("/movies", methods=['GET'])
 def get_movies():
     
-    movies_url = "http://192.168.43.191:3200"
+    movies_url = "http://localhost:3200"
     movies_response = requests.get(movies_url + "/json")
     print(movies_response)
     return make_response(movies_response.json(),200)
 
 @app.route("/myBookings/<userId>", methods=['GET'])
 def get_myBookings(userId):
-    bookings_url = "http://192.168.43.250:3201"
+    bookings_url = "http://localhost:3201"
     bookings_response = requests.get(bookings_url + "/bookings/"+userId)
     return make_response(bookings_response.json(),200)
 
 @app.route("/makeBooking/<userId>/<date>/<movie_id>", methods=['GET'])
 def make_booking(userId, date, movie_id):
-    bookings_url = "http://192.168.43.250:3201"
+    bookings_url = "http://localhost:3201"
     json_data = { "date" : date, "movieid" : movie_id } 
     bookings_response = requests.post(bookings_url + "/bookings/" + userId, json = json_data)
     return make_response(jsonify({"success":"True","data":bookings_response.json()}),200)
@@ -52,8 +52,8 @@ def make_booking(userId, date, movie_id):
 
 @app.route("/bookingInfo/<userId>", methods=['GET'])
 def get_booking_info(userId):
-    bookings_url = "http://192.168.43.250:3201"
-    movies_url = "http://192.168.43.191:3200"
+    bookings_url = "http://localhost:3201"
+    movies_url = "http://localhost:3200"
     
     # Get bookings for the user
     bookings_response = requests.get(bookings_url + "/bookings/" + userId)

@@ -37,7 +37,7 @@ def add_booking_byuser(userid):
    
    # Validate req..
    
-   showtimes_url = "http://192.168.43.226:3202"
+   showtimes_url = "http://localhost:3202"
    showtimes_response = requests.get(showtimes_url + "/showmovies/" + date)
    if showtimes_response.status_code != 200:
       return make_response(jsonify({"error": "Failed to retrieve showtimes"}), 400)
