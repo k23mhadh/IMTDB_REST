@@ -14,11 +14,13 @@ with open('{}/databases/times.json'.format("."), "r") as jsf:
 def home():
    return "<h1 style='color:blue'>Welcome to the Showtime service!</h1>"
 
+# Route to get the entire schedule of movies
 @app.route("/showtimes", methods=['GET'])
 def get_schedule():
     res = make_response(jsonify(schedule), 200)
     return res
 
+# Route to get movies by a specific date
 @app.route("/showmovies/<date>", methods=['GET'])
 def get_movies_bydate(date):
     for day in schedule:

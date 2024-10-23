@@ -16,11 +16,12 @@ with open('{}/databases/bookings.json'.format("."), "r") as jsf:
 def home():
    return "<h1 style='color:blue'>Welcome to the Booking service!</h1>"
 
+# Route to get all bookings in JSON format
 @app.route("/bookings", methods=['GET'])
 def get_json():
    return  make_response(jsonify(bookings), 200)
    
-   
+# Route to get booking details for a specific user by their user ID   
 @app.route("/bookings/<userid>", methods=['GET'])
 def get_booking_for_user(userid):
    for booking in bookings:
@@ -29,14 +30,12 @@ def get_booking_for_user(userid):
          return res
    return make_response(jsonify({"error":"Bad input parameter"}),400)
 
+# Route to add a new booking for a user
 @app.route("/bookings/<userid>", methods=['POST'])
 def add_booking_byuser(userid):
    req = request.get_json()
    date = req['date']
-   movieid = req['movieid']
-   
-   # Validate req..
-   
+   movieid = req['movieid']   
    showtimes_url = "http://localhost:3202"
    showtimes_response = requests.get(showtimes_url + "/showmovies/" + date)
    if showtimes_response.status_code != 200:

@@ -9,8 +9,7 @@ PORT = 3200
 HOST = '0.0.0.0'
 
 with open('{}/databases/movies.json'.format("."), 'r') as jsf:
-   movies = json.load(jsf)["movies"]
-
+   movies = json.load(jsf)
 # root message
 @app.route("/", methods=['GET'])
 def home():
@@ -20,11 +19,13 @@ def home():
 def template():
     return make_response(render_template('index.html', body_text='This is my HTML template for Movie service'),200)
 
+# Route that returns the entire movies dataset in JSON format
 @app.route("/json", methods=['GET'])
 def get_json():
     res = make_response(jsonify(movies), 200)
     return res
 
+# Route to get a specific movie by its ID
 @app.route("/movies/<movieid>", methods=['GET'])
 def get_movie_byid(movieid):
     for movie in movies:
@@ -33,6 +34,7 @@ def get_movie_byid(movieid):
             return res
     return make_response(jsonify({"error":"Movie ID not found"}),400)
 
+# Route to get a movie by its title via query parameters
 @app.route("/moviesbytitle", methods=['GET'])
 def get_movie_bytitle():
     json = ""
@@ -48,7 +50,7 @@ def get_movie_bytitle():
         res = make_response(jsonify(json),200)
     return res
 
-#TP
+# Route to get movies by director's name
 @app.route("/moviesbydirector", methods=['GET'])
 def get_movie_bydirector():
     if request.args:
@@ -60,6 +62,7 @@ def get_movie_bydirector():
     res = make_response(jsonify({"error": "No movies found for this director"}), 404)
     return res
 
+# Route to filter movies by their rating
 @app.route("/moviesbyrating/<rating>", methods=['GET'])
 def get_movies_by_rating(rating):
     filtered_movies = [movie for movie in movies if float(movie["rating"]) == float(rating)]
@@ -71,6 +74,7 @@ def get_movies_by_rating(rating):
     res = make_response(jsonify(filtered_movies), 200)
     return res
 
+# Route to filter movies within a range of ratings
 @app.route("/moviesbyratingrange/<min_rating>/<max_rating>", methods=['GET'])
 def get_movies_by_rating_range(min_rating, max_rating):
     try:
@@ -89,6 +93,7 @@ def get_movies_by_rating_range(min_rating, max_rating):
     res = make_response(jsonify(filtered_movies), 200)
     return res
 
+# Route to add a new movie 
 @app.route("/addmovie/<movieid>", methods=['POST'])
 def add_movie(movieid):
     req = request.get_json()
@@ -105,7 +110,8 @@ def add_movie(movieid):
 def write(movies):
     with open('{}/databases/movies.json'.format("."), 'w') as f:
         json.dump(movies, f)
-    
+
+# Route to update the rating of a movie by its ID via a PUT request  
 @app.route("/movies/<movieid>/<rate>", methods=['PUT'])
 def update_movie_rating(movieid, rate):
     for movie in movies:
@@ -117,6 +123,7 @@ def update_movie_rating(movieid, rate):
     res = make_response(jsonify({"error":"movie ID not found"}),201)
     return res
 
+# Route to provide a list of available API endpoints and their descriptions
 @app.route("/help", methods=['GET'])
 def help():
     endpoints = {
