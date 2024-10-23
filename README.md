@@ -1,4 +1,4 @@
-# TP Flask, REST et OpenAPI
+# IMTDB REST
 
 ## Overview
 This project implements a simple cinema management system with 4 microservices that all use REST API:
